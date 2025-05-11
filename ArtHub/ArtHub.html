@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ArtHub</title>
+    <link rel="stylesheet" href="MainStyle.css" />
+  </head>
+  <body>
+    <header>
+      <div class="logo">
+        <img src="Media/Logo/ArthubLogo.png" alt="ArtHub Logo" />
+      </div>
+      <div class="container">
+        <nav>
+          <ul class="nav-links">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Explore</a></li>
+            <li><a href="#">About Us</a></li>
+            <?php if (isset($_SESSION['UserID'])): ?>
+            <li>
+              <a href="profile.php"
+                ><img
+                  src="<?php echo $_SESSION['UserImagePath'] ?? 'default-avatar.jpg'; ?>"
+                  alt="Profile"
+                  class="avatar"
+              /></a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="container">
+        <h1>Welcome to ArtHub!</h1>
+      </div>
+    </section>
+
+    <section class="categories">
+      <h2>Categories <span class="more">more ></span></h2>
+      <div class="container">
+        <div class="category-grid">
+          <div class="category-card">
+            <img src="Media/Categories/ArtMuseums.jpg" alt="Art Museums" />
+            <p>Art Museums</p>
+          </div>
+          <div class="category-card">
+            <img
+              src="Media/Categories/SculptureMuseums.jpg"
+              alt="Sculpture Museums"
+            />
+            <p>Sculpture Museums</p>
+          </div>
+          <div class="category-card">
+            <img
+              src="Media/Categories/DigitalArtMuseums.jpg"
+              alt="Digital Art Museums"
+            />
+            <p>Digital Art Museums</p>
+          </div>
+          <div class="category-card">
+            <img
+              src="Media/Categories/VintageMuseums.jpg"
+              alt="Vintage Museums"
+            />
+            <p>Vintage Museums</p>
+          </div>
+          <div class="category-card">
+            <img
+              src="Media/Categories/HistoricalMuseums.jpg"
+              alt="Historical Museums"
+            />
+            <p>Historical Museums</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="best-museums">
+      <h2>Best Museums <span class="more">more ></span></h2>
+      <div class="container">
+        <div class="museum-section">
+          <div class="museum-image">
+            <img
+              src="Media/Museums/Futurione.png"
+              alt="FUTURIONE Modern Art Museum"
+            />
+          </div>
+          <div class="museum-info">
+            <div class="museum-details">
+              <h3>FUTURIONE</h3>
+              <p>Modern Art Museum</p>
+              <div class="rating">
+                <span>Rating:</span>
+                <span>4.8</span>
+                <div class="stars">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star-half-alt"></i>
+                </div>
+              </div>
+            </div>
+            <div class="reviews">
+              <div class="review">
+                <img src="Media/Pfp/ExpoHunter.jpg" alt="ExpoHunter Avatar" />
+                <div class="review-content">
+                  <h4>ExpoHunter</h4>
+                  <p>
+                    Visited the FUTURIONE digital exhibition in Moscow, and it
+                    was an incredible experience! The blend of art, technology,
+                    and futuristic design truly immerses you in a world of
+                    innovation. Each installation was interactive, visually
+                    stunning, and thought-provoking, showcasing how digital art
+                    can redefine creativity. A must-see for anyone interested in
+                    the future of art and tech!
+                  </p>
+                </div>
+                <div class="review-rating">
+                  <span>5★</span>
+                </div>
+              </div>
+              <div class="review">
+                <img
+                  src="Media/Pfp/MuseumFanatic.jpg"
+                  alt="MuseumFanatic Avatar"
+                />
+                <div class="review-content">
+                  <h4>MuseumFanatic</h4>
+                  <p>
+                    The perfect platform for art lovers! Exciting virtual tours
+                    and detailed descriptions of exhibits. I was especially
+                    pleased with the ability to create a selection of your
+                    favorite museums. Perfect for inspiration!
+                  </p>
+                </div>
+                <div class="review-rating">
+                  <span>4★</span>
+                </div>
+              </div>
+            </div>
+            <button class="more-button">More</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="museum-album">
+      <h2>FUTURIONE album:</h2>
+      <div class="album-container">
+        <div class="album-image">
+          <img
+            src="Media/Museums/4ea3b10c4c12e7ce787e379dd1e8059c.jpg"
+            alt="Image 1"
+          />
+        </div>
+        <div class="album-image">
+          <img
+            src="Media/Museums/900f00b9-f59d-40c6-b101-8bdc95346a0a.jpg"
+            alt="Image 2"
+          />
+        </div>
+        <div class="album-image">
+          <img src="Media/Museums/159199_original.jpg" alt="Image 3" />
+        </div>
+        <div class="album-image">
+          <img src="Media/Museums/QNUP7uyay2g.jpg" alt="Image 4" />
+        </div>
+        <!-- Можно добавить больше изображений -->
+      </div>
+      <div class="pagination">
+        <span class="dot active"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <!-- Можно добавить больше кружков -->
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-left">
+            <img
+              src="Media/Logo/logo.png"
+              alt="ArtHub Logo"
+              class="footer-logo"
+            />
+            <p>Blahblah ArtHub:</p>
+            <ul class="social-links">
+              <li>
+                <a href="#"><i class="fab fa-facebook"></i> Facebook</a>
+              </li>
+              <li>
+                <a href="#"><i class="fab fa-instagram"></i> Instagram</a>
+              </li>
+              <li>
+                <a href="#"><i class="fab fa-twitter"></i> Twitter</a>
+              </li>
+            </ul>
+          </div>
+          <div class="footer-center">
+            <p>
+              This website is a thesis project and does not claim any commercial
+              profit. All content presented here is for educational purposes
+              only.
+            </p>
+          </div>
+          <div class="footer-right">
+            <p>Blahblah © 2025, ArtHub</p>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
