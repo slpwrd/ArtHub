@@ -4,55 +4,39 @@ require 'config.php';
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Проверка прав доступа
 if (!isset($_SESSION['RoleID']) || $_SESSION['RoleID'] !== 'Admin') {
     header("Location: ArtHub.php");
     exit();
 }
 
-// Обработка POST-запросов
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['create'])) {
-        // Создание нового пользователя
         $username = $_POST['username'];
         $email = $_POST['email'];
         $role = $_POST['role'];
         $password = $_POST['password'];
         $avatar = $_POST['avatar'] ?? null;
 
-        // Хеширование пароля
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-        // Вставка данных в базу
         $stmt = $pdo->prepare("INSERT INTO users (UserName, UserEmail, UserPassword, RoleID, UserImagePath) VALUES (?, ?, ?, ?, ?)");
         $stmt->execute([$username, $email, $hashedPassword, $role, $avatar]);
     } elseif (isset($_POST['update'])) {
-        // Обновление существующего пользователя
         $id = $_POST['id'];
         $username = $_POST['username'];
         $email = $_POST['email'];
         $role = $_POST['role'];
         $avatar = $_POST['avatar'] ?? null;
-        $password = $_POST['password'];
 
-        // Если пароль не пустой — обновляем его
-        if (!empty($password)) {
-            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $pdo->prepare("UPDATE users SET UserName = ?, UserEmail = ?, RoleID = ?, UserImagePath = ?, UserPassword = ? WHERE UserID = ?");
-            $stmt->execute([$username, $email, $role, $avatar, $hashedPassword, $id]);
-        } else {
-            $stmt = $pdo->prepare("UPDATE users SET UserName = ?, UserEmail = ?, RoleID = ?, UserImagePath = ? WHERE UserID = ?");
-            $stmt->execute([$username, $email, $role, $avatar, $id]);
-        }
+        $stmt = $pdo->prepare("UPDATE users SET UserName = ?, UserEmail = ?, RoleID = ?, UserImagePath = ? WHERE UserID = ?");
+        $stmt->execute([$username, $email, $role, $avatar, $id]);
     } elseif (isset($_POST['delete'])) {
-        // Удаление пользователя
         $id = $_POST['id'];
         $stmt = $pdo->prepare("DELETE FROM users WHERE UserID = ?");
         $stmt->execute([$id]);
     }
 }
 
-// Получение списка пользователей
 $stmt = $pdo->query("SELECT * FROM users");
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
@@ -64,8 +48,10 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Management - ArtHub</title>
     <link rel="stylesheet" href="MainStyle.css">
+
     <!-- Croppie CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.css ">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.css " />
+
     <style>
         .container {
             max-width: 1200px;
@@ -73,11 +59,13 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
             padding: 40px 20px;
             text-align: center;
         }
+
         .admin-header {
             position: relative;
             text-align: center;
             padding: 20px 0;
         }
+
         .back-button {
             position: absolute;
             left: 20px;
@@ -94,23 +82,28 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
             white-space: nowrap;
             font-size: 14px;
         }
+
         .user-table {
             width: 100%;
             border-collapse: collapse;
             margin: 20px auto;
             text-align: center;
         }
+
         .user-table th, .user-table td {
             border: 1px solid #ddd;
             padding: 12px;
             text-align: center;
         }
+
         .user-table th {
             background-color: #f8f9fa;
         }
+
         .user-table tr:nth-child(even) {
             background-color: #f9f9f9;
         }
+
         .form-container {
             margin: 30px auto;
             border: 1px solid #ddd;
@@ -120,6 +113,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
             width: 100%;
             max-width: 400px;
         }
+
         .action-button,
         .delete-button {
             display: inline-block;
@@ -134,18 +128,23 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
             border: none;
             transition: background-color 0.3s ease;
         }
+
         .action-button {
             background-color: #12a73e;
         }
+
         .action-button:hover {
             background-color: rgb(21, 226, 83);
         }
+
         .delete-button {
             background-color: #dc3545 !important;
         }
+
         .delete-button:hover {
             background-color: #a71d2a !important;
         }
+
         .modal-form {
             display: none;
             position: fixed;
@@ -159,6 +158,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
             z-index: 1000;
             min-width: 300px;
         }
+
         .overlay {
             display: none;
             position: fixed;
@@ -169,6 +169,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
             background: rgba(0,0,0,0.5);
             z-index: 999;
         }
+
         .cancel-button {
             display: inline-block;
             padding: 8px 14px;
@@ -183,13 +184,14 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
             border: none;
             transition: background-color 0.3s ease;
         }
+
         .cancel-button:hover {
             background-color: #333;
         }
+
         input[type="text"],
         input[type="email"],
-        input[type="password"],
-        select {
+        input[type="password"] {
             width: 100%;
             padding: 8px;
             margin: 10px 0;
@@ -197,31 +199,38 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
             border-radius: 5px;
             font-size: 14px;
         }
+
         .add-user-form button,
         .edit-user-form button {
             padding: 10px 18px;
             font-size: 14px;
             margin-top: 15px;
         }
+
         h3.modal-title {
             margin-top: 0;
             margin-bottom: 15px;
             font-size: 20px;
             color: #333;
         }
+
         .upload-demo {
             margin: 10px auto;
         }
+
         .croppie-container {
             margin: 10px auto;
         }
     </style>
 </head>
 <body>
+
 <header class="admin-header">
     <a href="ArtHub.php" class="back-button">← Back</a>
 </header>
+
 <div class="container">
+
     <!-- Таблица пользователей -->
     <table class="user-table">
         <thead>
@@ -230,7 +239,6 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <th>Username</th>
                 <th>Email</th>
                 <th>Role</th>
-                <th>Password</th>
                 <th>Registration Date</th>
                 <th>Avatar</th>
                 <th>Actions</th>
@@ -243,10 +251,6 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <td><?= htmlspecialchars($user['UserName']) ?></td>
                 <td><?= htmlspecialchars($user['UserEmail']) ?></td>
                 <td><?= htmlspecialchars($user['RoleID']) ?></td>
-                <td>
-                    <!-- Расшифрованный пароль -->
-                    <?= htmlspecialchars(password_verify('default_password', $user['UserPassword']) ? 'default_password' : '********') ?>
-                </td>
                 <td><?= htmlspecialchars($user['UserCreationDate']) ?></td>
                 <td>
                     <?php if ($user['UserImagePath']): ?>
@@ -266,6 +270,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <?php endforeach; ?>
         </tbody>
     </table>
+
     <!-- Форма добавления нового пользователя -->
     <div class="form-container add-user-form">
         <h2>Add New User</h2>
@@ -275,12 +280,10 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <label for="email">Email:</label><br>
             <input type="email" name="email"><br>
             <label for="role">Role:</label><br>
-            <select name="role" required>
-                <option value="User">User</option>
-                <option value="Admin">Admin</option>
-            </select><br>
+            <input type="text" name="role" required><br>
             <label for="password">Password:</label><br>
             <input type="password" name="password" required><br>
+
             <!-- Загрузка аватара -->
             <label for="avatar">Avatar:</label><br>
             <input type="file" id="upload-avatar" accept="image/*"><br>
@@ -288,9 +291,11 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <div id="upload-croppie"></div>
             </div>
             <input type="hidden" name="avatar" id="avatar-data">
+
             <button type="submit" name="create">Create</button>
         </form>
     </div>
+
     <!-- Модальное окно для редактирования -->
     <div id="updateModal" class="modal-form" style="display:none;">
         <h3 class="modal-title">Edit User</h3>
@@ -301,28 +306,28 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <label for="email">Email:</label><br>
             <input type="email" name="email" id="edit-email"><br>
             <label for="role">Role:</label><br>
-            <select name="role" id="edit-role" required>
-                <option value="User">User</option>
-                <option value="Admin">Admin</option>
-            </select><br>
-            <label for="password">New Password:</label><br>
-            <input type="password" name="password" placeholder="Leave empty to keep current password"><br>
+            <input type="text" name="role" id="edit-role" required><br>
             <button type="submit" name="update">Update</button>
             <button type="button" class="cancel-button" onclick="closeUpdateForm()">Cancel</button>
         </form>
     </div>
     <div class="overlay" id="overlay" onclick="closeUpdateForm()"></div>
+
 </div>
+
 <!-- Croppie JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.js "></script>
+
 <script>
     var $uploadCrop;
+
     window.onload = function () {
         $uploadCrop = new Croppie(document.getElementById('upload-croppie'), {
             viewport: { width: 120, height: 120, type: 'circle' },
             boundary: { width: 150, height: 150 },
             showZoomer: true
         });
+
         document.getElementById('upload-avatar').addEventListener('change', function () {
             const reader = new FileReader();
             reader.onload = function (e) {
@@ -330,27 +335,33 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
             };
             reader.readAsDataURL(this.files[0]);
         });
+
         $uploadCrop.on('update.croppie', function () {
             $uploadCrop.result('base64').then(function (base64) {
                 document.getElementById('avatar-data').value = base64;
             });
         });
     };
+
     function openUpdateForm(userId) {
         const user = <?= json_encode(array_column($users, null, 'UserID')) ?>;
         const data = user[userId];
         if (!data) return;
+
         document.getElementById('edit-id').value = data.UserID;
         document.getElementById('edit-username').value = data.UserName;
         document.getElementById('edit-email').value = data.UserEmail;
         document.getElementById('edit-role').value = data.RoleID;
+
         document.getElementById('updateModal').style.display = 'block';
         document.getElementById('overlay').style.display = 'block';
     }
+
     function closeUpdateForm() {
         document.getElementById('updateModal').style.display = 'none';
         document.getElementById('overlay').style.display = 'none';
     }
 </script>
+
 </body>
 </html>

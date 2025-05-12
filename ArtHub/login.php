@@ -1,24 +1,35 @@
 <?php
 session_start();
-require 'config.php';
+require 'config.php';  // Подключаем файл для работы с базой данных
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['UserName']);
     $password = $_POST['UserPassword'];
 
-    $stmt = $pdo->prepare("SELECT * FROM Users WHERE UserName = ?");
-    $stmt->execute([$username]);
-    $user = $stmt->fetch();
-
-    if ($user && password_verify($password, $user['UserPassword'])) {
-        $_SESSION['UserID'] = $user['UserID'];
-        $_SESSION['UserName'] = $user['UserName'];
-        $_SESSION['UserImagePath'] = $user['UserImagePath'];
-        $_SESSION['RoleID'] = $user['RoleID'];
-        header('Location: profile.php'); //перенаправление в профиль
-        exit();
+    // Проверяем, что оба поля не пустые
+    if (empty($username) || empty($password)) {
+        $error = 'Please fill in all fields';
     } else {
-        $error = "Invalid credentials!";
+        // Проверяем, существует ли пользователь с таким именем
+        $stmt = $pdo->prepare("SELECT * FROM Users WHERE UserName = ?");
+        $stmt->execute([$username]);
+        $user = $stmt->fetch();
+
+        // Если пользователь существует, проверяем правильность пароля
+        if ($user && password_verify($password, $user['UserPassword'])) {
+            // Если логин успешен, сохраняем данные в сессии
+            $_SESSION['UserID'] = $user['UserID'];
+            $_SESSION['UserName'] = $user['UserName'];
+            $_SESSION['UserImagePath'] = $user['UserImagePath'];  // Путь к изображению профиля
+            $_SESSION['RoleID'] = $user['RoleID'];  // Роль пользователя
+
+            // Перенаправляем на главную страницу или другую страницу
+            header('Location: ArtHub.php');
+            exit();
+        } else {
+            // Если логин не успешен
+            $error = 'Invalid username or password';
+        }
     }
 }
 ?>
@@ -43,6 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <button type="submit" class="btn">Login</button>
     </form>
+    <p>Dont have a account? <a href="register.php">Register now</a></p>
 
     <?php if (!empty($error)): ?>
         <div class="error"><?= $error; ?></div>

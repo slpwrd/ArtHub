@@ -1,3 +1,8 @@
+<?php
+session_start();
+require 'config.php';
+?>
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -5,31 +10,169 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ArtHub</title>
     <link rel="stylesheet" href="MainStyle.css" />
+    <style>
+      .nav-links li a img.avatar {
+        border-radius: 50%;
+        width: 60px !important;
+        height: 60px !important;
+        object-fit: cover; 
+      }
+
+      .nav-links {
+        font-family: "BIZ UDPMincho", serif;
+        font-size: 18px;
+        font-weight: bold;
+        list-style: none;
+        display: flex;
+        gap: 20px;
+        margin-left: 65%;
+        align-items: center; /* Центрирование по вертикали */
+      }
+
+      .nav-links li {
+        display: flex;
+        align-items: center; /* Центрирование по вертикали */
+      }
+
+      .nav-links li a {
+        text-decoration: none;
+        color: #333;
+        font-weight: bold;
+        position: relative;
+        white-space: nowrap;
+        display: flex;
+        align-items: center; /* Центрирование по вертикали */
+      }
+
+      .nav-links li a::after {
+        content: "";
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background-color: #12a73e;
+        transform: scaleX(0);
+        transition: transform 0.3s ease-in-out;
+      }
+
+      .nav-links li a:hover::after {
+        transform: scaleX(1);
+      }
+
+      .profile-section {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Расстояние между кнопкой и аватаркой */
+}
+
+.admin-menu-btn {
+    color: #12a73e;
+    font-weight: bold;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: all 0.3s;
+    margin-right: 10px;
+}
+
+.admin-menu-btn:hover {
+    background: #f0f0f0;
+    color: #0e8a31;
+}
+
+.admin-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: #fff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border-radius: 4px;
+    padding: 10px;
+    z-index: 1000;
+    min-width: 200px;
+}
+
+.admin-menu a {
+    display: block;
+    padding: 8px 15px;
+    color: #333;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.admin-menu a:hover {
+    background: #f5f5f5;
+}
+    </style>
+<script>
+// Обновлённый скрипт с обработкой события
+function toggleAdminMenu(event) {
+    event.preventDefault();
+    const menu = document.getElementById('adminMenu');
+    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+}
+
+// Закрытие при клике вне меню
+document.addEventListener('click', (event) => {
+    const menu = document.getElementById('adminMenu');
+    const btn = document.querySelector('.admin-menu-btn');
+    
+    if (!menu.contains(event.target) && 
+        !btn.contains(event.target) &&
+        menu.style.display === 'block') {
+        menu.style.display = 'none';
+    }
+});
+</script>
+
   </head>
   <body>
-    <header>
-      <div class="logo">
-        <img src="Media/Logo/ArthubLogo.png" alt="ArtHub Logo" />
-      </div>
-      <div class="container">
+  <header>
+    <div class="logo">
+        <img src="Media/Logo/ArthubLogo.png" alt="ArtHub Logo">
+    </div>
+    <div class="container">
         <nav>
-          <ul class="nav-links">
-            <li><a href="#">Home</a></li>
-            <li><a href="#">Explore</a></li>
-            <li><a href="#">About Us</a></li>
-            <?php if (isset($_SESSION['UserID'])): ?>
-            <li>
-              <a href="profile.php"
-                ><img
-                  src="<?php echo $_SESSION['UserImagePath'] ?? 'default-avatar.jpg'; ?>"
-                  alt="Profile"
-                  class="avatar"
-              /></a>
-            </li>
-          </ul>
+            <ul class="nav-links">
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Explore</a></li>
+                <li><a href="#">About Us</a></li>
+                <?php if (isset($_SESSION['UserID'])): ?>
+                    <li class="profile-section">
+                        <?php if (isset($_SESSION['RoleID']) && $_SESSION['RoleID'] === 'Admin'): ?>
+                            <a href="#" class="admin-menu-btn" onclick="toggleAdminMenu(event)">
+                                Admin
+                            </a>
+                        <?php endif; ?>
+
+                        <a href="./profile.php">
+                            <img
+                                src="<?php echo isset($_SESSION['UserImagePath']) && file_exists($_SESSION['UserImagePath']) ? $_SESSION['UserImagePath'] : './uploads/defaultavatar.png'; ?>"
+                                alt="Profile"
+                                class="avatar"
+                            />
+                        </a>
+
+                        <?php if (isset($_SESSION['RoleID']) && $_SESSION['RoleID'] === 'Admin'): ?>
+                            <div id="adminMenu" class="admin-menu">
+                                <a >Control panel</a>
+                                <a href="./usermanagement.php">User management</a>
+                                <a >Content moderation</a>
+                            </div>
+                        <?php endif; ?>
+                    </li>
+                <?php else: ?>
+                    <li>
+                        <a href="login.php" class="login-button">Login</a>
+                    </li>
+                <?php endif; ?>
+            </ul>
         </nav>
-      </div>
-    </header>
+    </div>
+</header>
 
     <section class="hero">
       <div class="container">
@@ -168,14 +311,12 @@
         <div class="album-image">
           <img src="Media/Museums/QNUP7uyay2g.jpg" alt="Image 4" />
         </div>
-        <!-- Можно добавить больше изображений -->
       </div>
       <div class="pagination">
         <span class="dot active"></span>
         <span class="dot"></span>
         <span class="dot"></span>
         <span class="dot"></span>
-        <!-- Можно добавить больше кружков -->
       </div>
     </section>
 
